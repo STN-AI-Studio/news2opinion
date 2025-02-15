@@ -17,24 +17,51 @@ interface AnalysisResult {
   timeline?: string[];
 }
 
+// 新增进度状态类型
+type ProgressState = {
+  currentStep: string;
+  keywords?: string[];
+  fetchedCount?: number;
+  totalCount?: number;
+  fetchedUrls?: string[];
+};
+
 export default function Home() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState<ProgressState | null>(null);
 
   const analyzeUrl = async (url: string) => {
     setLoading(true);
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url })
       });
-      console.log(res);
-      setResult(await res.json());
+
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      
+      while (reader) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const message = JSON.parse(decoder.decode(value));
+        if (message.error) {
+          alert(message.error);
+          break;
+        }
+        
+        if (message.step) {
+          setProgress(message);
+        } else {
+          setResult(message);
+        }
+      }
     } finally {
       setLoading(false);
+      setProgress(null);
     }
   };
 
@@ -53,6 +80,32 @@ export default function Home() {
         />
         
         {loading && <div className={styles.loading}>生成中...</div>}
+        
+        {progress && (
+          <div className={styles.progress}>
+            <div className={styles.step}>{progress.currentStep}</div>
+            {progress.keywords && (
+              <div>已找到关键词：{progress.keywords.join(', ')}</div>
+            )}
+            {progress.fetchedUrls && (
+              <div className={styles.urls}>
+                已抓取链接：
+                <ul>
+                  {progress.fetchedUrls.map((url,i) => 
+                    <li key={i}>{url.slice(0,50)}...</li>
+                  )}
+                </ul>
+              </div>
+            )}
+            {progress.fetchedCount !== undefined && (
+              <progress 
+                className={styles.progressElement}
+                value={progress.fetchedCount} 
+                max={progress.totalCount}
+              />
+            )}
+          </div>
+        )}
         
         {result && (
           <div className={styles.result}>
