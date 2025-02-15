@@ -68,7 +68,7 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <h1>自媒体观点生成器</h1>
+        <h1>自媒体观点生成器 V0.1</h1>
         <input 
           type="url"
           placeholder="输入新闻URL"
