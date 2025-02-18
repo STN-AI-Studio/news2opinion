@@ -42,7 +42,7 @@ export async function POST(req: Request) {
       const pageData = {
         title: $('title').text(),
         description: $('meta[name="description"]').attr('content') || '',
-        content: $('body').text().substring(0, 200) // 截取前2000字符
+        content: $('body').text().substring(0, 10000) // 截取前10000字符
       };
       
       // 推送网页内容摘要
