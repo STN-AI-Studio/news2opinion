@@ -42,15 +42,16 @@ export async function POST(req: Request) {
       const pageData = {
         title: $('title').text(),
         description: $('meta[name="description"]').attr('content') || '',
-        content: $('body').text().substring(0, 10000) // 截取前2000字符
+        content: $('body').text().substring(0, 200) // 截取前2000字符
       };
       
       // 推送网页内容摘要
       await writer.write(encoder.encode(JSON.stringify({
         step: steps.FETCH_PAGE,
-        data: {
+        pageContent: {
           ...pageData,
-          contentPreview: pageData.content.substring(0, 200) + '...' // 只推送前200字符
+          contentPreview: pageData.content.substring(0, 200) + '...',
+          url
         }
       })));
      
@@ -101,11 +102,9 @@ export async function POST(req: Request) {
         // 推送当前关键词的搜索结果
         await writer.write(encoder.encode(JSON.stringify({
           step: steps.FETCH_CONTENTS,
-          data: { 
-            keyword, 
-            progress: contents.length,
-            fetchedUrls: urls // 新增链接列表
-          }
+          fetchedUrls: urls,  // 直接使用正确字段名
+          fetchedCount: contents.length + 1,
+          totalCount: keywords.length * 2  // 假设每个关键词抓取2个链接
         })));
 
         for (const url of urls) {

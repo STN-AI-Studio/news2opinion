@@ -48,26 +48,46 @@ export default function Home() {
 
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
+      let buffer = '';
       
       while (reader) {
         const { done, value } = await reader.read();
         if (done) break;
         
-        const message = JSON.parse(decoder.decode(value));
-        if (message.error) {
-          alert(message.error);
-          break;
+        buffer += decoder.decode(value);
+        
+        let boundary;
+        while ((boundary = buffer.indexOf('}{')) !== -1) {
+          const message = buffer.slice(0, boundary + 1);
+          buffer = buffer.slice(boundary + 1);
+          processMessage(JSON.parse(message));
         }
         
-        if (message.step) {
-          setProgress(message);
-        } else {
-          setResult(message);
+        if (buffer.length > 0) {
+          try {
+            processMessage(JSON.parse(buffer));
+            buffer = '';
+          } catch (e) {
+            // 不完整的JSON保留在缓冲区
+          }
         }
       }
     } finally {
       setLoading(false);
       setProgress(null);
+    }
+  };
+
+  const processMessage = (message: any) => {
+    if (message.error) {
+      alert(message.error);
+      return;
+    }
+    
+    if (message.step) {
+      setProgress(prev => ({ ...prev, ...message }));
+    } else {
+      setResult(message);
     }
   };
 
