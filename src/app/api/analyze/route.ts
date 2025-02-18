@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
 
 const steps = {
+  FETCH_PAGE: '正在获取网页内容',
   EXTRACT_KEYWORDS: '正在提取流量关键词',
   GOOGLE_SEARCH: '正在执行Google搜索',
   FETCH_CONTENTS: '正在抓取网页内容',
@@ -23,6 +24,12 @@ export async function POST(req: Request) {
   
   (async () => {
     try {
+      // 推送网页获取步骤
+      await writer.write(encoder.encode(JSON.stringify({ 
+        step: steps.FETCH_PAGE,
+        data: { url }  // 包含原始URL
+      })));
+
       // 直接获取网页内容
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
@@ -31,17 +38,25 @@ export async function POST(req: Request) {
       const html = await pageRes.text();
       const $ = cheerio.load(html);
       
-      // 提取关键内容
+      // 提取关键内容后再次推送带内容的更新
       const pageData = {
         title: $('title').text(),
         description: $('meta[name="description"]').attr('content') || '',
-        content: $('body').text().substring(0, 2000) // 截取前2000字符
+        content: $('body').text().substring(0, 10000) // 截取前2000字符
       };
-      console.log(pageData);
       
+      // 推送网页内容摘要
+      await writer.write(encoder.encode(JSON.stringify({
+        step: steps.FETCH_PAGE,
+        data: {
+          ...pageData,
+          contentPreview: pageData.content.substring(0, 200) + '...' // 只推送前200字符
+        }
+      })));
+     
       // 步骤3：提取关键词
       await writer.write(encoder.encode(JSON.stringify({ step: steps.EXTRACT_KEYWORDS })));
-      const keywordsRes = await fetch('https://qianfan.baiduce.com/v2/chat/completions', {
+      const keywordsRes = await fetch('https://qianfan.baidubce.com/v2/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +116,7 @@ export async function POST(req: Request) {
 
       // 步骤7：最终分析
       await writer.write(encoder.encode(JSON.stringify({ step: steps.FINAL_ANALYSIS })));
-      const finalRes = await fetch('https://qianfan.baiduce.com/v2/chat/completions', {
+      const finalRes = await fetch('https://qianfan.baidubce.com/v2/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

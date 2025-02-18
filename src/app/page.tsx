@@ -17,9 +17,15 @@ interface AnalysisResult {
   timeline?: string[];
 }
 
-// 新增进度状态类型
+// 更新进度状态类型
 type ProgressState = {
   currentStep: string;
+  pageContent?: {
+    title: string;
+    description: string;
+    contentPreview: string;
+    url: string;
+  };
   keywords?: string[];
   fetchedCount?: number;
   totalCount?: number;
@@ -104,6 +110,16 @@ export default function Home() {
                 max={progress.totalCount}
               />
             )}
+          </div>
+        )}
+        
+        {progress?.pageContent && (
+          <div className={styles.pagePreview}>
+            <h3>原始内容分析</h3>
+            <div className={styles.url}>来源：{progress.pageContent.url}</div>
+            <div className={styles.title}>{progress.pageContent.title}</div>
+            <div className={styles.description}>{progress.pageContent.description}</div>
+            <div className={styles.content}>{progress.pageContent.contentPreview}</div>
           </div>
         )}
         
