@@ -30,7 +30,7 @@ type ProgressState = {
   fetchedCount?: number;
   totalCount?: number;
   fetchedUrls?: Array<{
-    url: string, 
+    url: string,
     title: string,
     contentPreview?: string  // 添加内容预览字段
   }>;
@@ -53,20 +53,20 @@ export default function Home() {
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
-      
+
       while (reader) {
         const { done, value } = await reader.read();
         if (done) break;
-        
+
         buffer += decoder.decode(value);
-        
+
         let boundary;
         while ((boundary = buffer.indexOf('}{')) !== -1) {
           const message = buffer.slice(0, boundary + 1);
           buffer = buffer.slice(boundary + 1);
           processMessage(JSON.parse(message));
         }
-        
+
         if (buffer.length > 0) {
           try {
             processMessage(JSON.parse(buffer));
@@ -87,16 +87,35 @@ export default function Home() {
       alert(message.error);
       return;
     }
-    
+
     if (message.step) {
-      setProgress(prev => ({
-        ...prev,
-        ...message,
-        // 如果有新的 fetchedUrls，将其与现有的合并而不是覆盖
-        fetchedUrls: message.fetchedUrls 
-          ? [...(prev?.fetchedUrls || []), ...message.fetchedUrls]
-          : prev?.fetchedUrls
-      }));
+      setProgress(prev => {
+        // 如果有新的 fetchedUrls，需要更新或添加
+        let updatedFetchedUrls = prev?.fetchedUrls || [];
+        if (message.fetchedUrls) {
+          message.fetchedUrls.forEach((newUrl: any) => {
+            const existingIndex = updatedFetchedUrls.findIndex(
+              existing => existing.url === newUrl.url
+            );
+            if (existingIndex >= 0) {
+              // 更新已存在的URL信息
+              updatedFetchedUrls[existingIndex] = {
+                ...updatedFetchedUrls[existingIndex],
+                ...newUrl
+              };
+            } else {
+              // 添加新的URL
+              updatedFetchedUrls = [...updatedFetchedUrls, newUrl];
+            }
+          });
+        }
+
+        return {
+          ...prev,
+          ...message,
+          fetchedUrls: updatedFetchedUrls
+        };
+      });
     } else {
       setResult(message);
     }
@@ -106,7 +125,7 @@ export default function Home() {
     <div className={styles.page}>
       <main className={styles.main}>
         <h1>自媒体观点生成器 V0.1</h1>
-        <input 
+        <input
           type="url"
           placeholder="输入新闻URL"
           onKeyDown={(e) => {
@@ -115,9 +134,9 @@ export default function Home() {
             }
           }}
         />
-        
+
         {loading && <div className={styles.loading}>生成中...</div>}
-        
+
         {progress && (
           <div className={styles.progress}>
             <h3>当前步骤：{progress.step}</h3>
@@ -129,13 +148,13 @@ export default function Home() {
                 <div className={styles.urls}>
                   <h4>已抓取链接：</h4>
                   <ul>
-                    {progress.fetchedUrls.map((item, i) => 
+                    {progress.fetchedUrls.map((item, i) =>
                       <li key={i}>
                         <div className={styles.title}>{item.title}</div>
-                        <a href={item.url} 
-                           target="_blank" 
-                           rel="noopener noreferrer" 
-                           className={styles.urlLink}>
+                        <a href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.urlLink}>
                           {item.url}
                         </a>
                         {item.contentPreview && (
@@ -149,16 +168,16 @@ export default function Home() {
                 </div>
               )}
               {progress.fetchedCount !== undefined && (
-                <progress 
+                <progress
                   className={styles.progressElement}
-                  value={progress.fetchedCount} 
+                  value={progress.fetchedCount}
                   max={progress.totalCount}
                 />
               )}
             </div>
           </div>
         )}
-        
+
         {progress?.pageContent && (
           <div className={styles.pagePreview}>
             <h3>原始内容分析</h3>
@@ -168,7 +187,7 @@ export default function Home() {
             <div className={styles.content}>{progress.pageContent.contentPreview}</div>
           </div>
         )}
-        
+
         {result && (
           <div className={styles.result}>
             <h2>{result.title}</h2>
@@ -177,25 +196,25 @@ export default function Home() {
             <div className={styles.section}>
               <h3>主体分析</h3>
               <ul>
-                {(result.entities || []).map((e,i) => <li key={i}>{e}</li>)}
+                {(result.entities || []).map((e, i) => <li key={i}>{e}</li>)}
               </ul>
             </div>
             <div className={styles.section}>
               <h3>时间线</h3>
               <ul className={styles.timeline}>
-                {(result.timeline || []).map((t,i) => (
+                {(result.timeline || []).map((t, i) => (
                   <li key={i}>{t}</li>
                 ))}
               </ul>
             </div>
             <div className={styles.section}>
               <h3>观点矩阵</h3>
-              {(result.opinions || []).map((o,i) => (
+              {(result.opinions || []).map((o, i) => (
                 <div key={i} className={styles.opinion}>
                   <div className={styles[o.type]}>{o.type}</div>
                   <p>{o.content}</p>
                   <ul>
-                    {(o.subpoints || []).map((s,j) => <li key={j}>{s}</li>)}
+                    {(o.subpoints || []).map((s, j) => <li key={j}>{s}</li>)}
                   </ul>
                 </div>
               ))}
