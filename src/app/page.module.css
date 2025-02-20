@@ -201,11 +201,18 @@ a.secondary {
 }
 .urls ul {
   list-style: none;
-  padding-left: 0;
-  margin: 4px 0;
+  padding: 0;
 }
 .urls li {
-  word-break: break-all;
+  margin-bottom: 1rem;
+}
+
+.urlLink {
   color: #666;
-  line-height: 1.4;
+  font-size: 0.9em;
+  text-decoration: none;
+}
+
+.urlLink:hover {
+  text-decoration: underline;
 }

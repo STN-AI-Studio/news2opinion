@@ -13,7 +13,10 @@ const steps = {
 async function googleSearch(keyword: string) {
   const res = await fetch(`https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_KEY}&cx=${process.env.GOOGLE_CX}&q=${encodeURIComponent(keyword)}`);
   const data = await res.json();
-  return data.items?.slice(0, 2).map((item: any) => item.link) || [];
+  return data.items?.slice(0, 2).map((item: any) => ({
+    url: item.link,
+    title: item.title
+  })) || [];
 }
 
 export async function POST(req: Request) {
@@ -104,17 +107,17 @@ export async function POST(req: Request) {
       
       const contents = [];
       for (const keyword of keywords.keywords) {
-        const urls = await googleSearch(keyword);
-        // 推送当前关键词的搜索结果
+        const results = await googleSearch(keyword);
+        // 推送当前关键词的搜索结果，现在包含标题
         await writer.write(encoder.encode(JSON.stringify({
           step: steps.FETCH_CONTENTS,
-          fetchedUrls: urls,  // 直接使用正确字段名
+          fetchedUrls: results,  // 现在包含 url 和 title
           fetchedCount: contents.length + 1,
-          totalCount: keywords.keywords.length * 2  // 假设每个关键词抓取2个链接
+          totalCount: keywords.keywords.length * 2
         })));
 
-        for (const url of urls) {
-          const content = await fetch(url).then(r => r.text());
+        for (const result of results) {
+          const content = await fetch(result.url).then(r => r.text());
           contents.push({ keyword, content: cheerio.load(content).text() });
         }
       }

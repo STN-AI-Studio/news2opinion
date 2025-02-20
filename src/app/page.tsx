@@ -29,7 +29,7 @@ type ProgressState = {
   keywords?: string[];
   fetchedCount?: number;
   totalCount?: number;
-  fetchedUrls?: string[];
+  fetchedUrls?: Array<{url: string, title: string}>;
 };
 
 export default function Home() {
@@ -118,8 +118,15 @@ export default function Home() {
                 <div className={styles.urls}>
                   已抓取链接：
                   <ul>
-                    {progress.fetchedUrls.map((url,i) => 
-                      <li key={i}>{url.slice(0,50)}...</li>
+                    {progress.fetchedUrls.map((item, i) => 
+                      <li key={i}>
+                        {item.title}
+                        <br />
+                        <a href={item.url} target="_blank" rel="noopener noreferrer" 
+                           className={styles.urlLink}>
+                          {item.url}
+                        </a>
+                      </li>
                     )}
                   </ul>
                 </div>
