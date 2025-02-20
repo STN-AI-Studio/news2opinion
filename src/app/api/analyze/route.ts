@@ -64,7 +64,7 @@ export async function POST(req: Request) {
           'Authorization': `Bearer ${process.env.QIANFAN_KEY}`
         },
         body: JSON.stringify({
-          model: "deepseek-r1",
+          model: "deepseek-v3",
           messages: [{
             role: "user",
             content: `请从以下网页内容中提取最具传播潜力的流量关键词，要求：
