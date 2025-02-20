@@ -85,7 +85,14 @@ export default function Home() {
     }
     
     if (message.step) {
-      setProgress(prev => ({ ...prev, ...message }));
+      setProgress(prev => ({
+        ...prev,
+        ...message,
+        // 如果有新的 fetchedUrls，将其与现有的合并而不是覆盖
+        fetchedUrls: message.fetchedUrls 
+          ? [...(prev?.fetchedUrls || []), ...message.fetchedUrls]
+          : prev?.fetchedUrls
+      }));
     } else {
       setResult(message);
     }
