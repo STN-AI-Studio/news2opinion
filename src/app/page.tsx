@@ -19,7 +19,7 @@ interface AnalysisResult {
 
 // 更新进度状态类型
 type ProgressState = {
-  currentStep: string;
+  step: string;
   pageContent?: {
     title: string;
     description: string;
@@ -109,27 +109,29 @@ export default function Home() {
         
         {progress && (
           <div className={styles.progress}>
-            <div className={styles.step}>{progress.currentStep}</div>
-            {progress.keywords && (
-              <div>已找到关键词：{progress.keywords.join(', ')}</div>
-            )}
-            {progress.fetchedUrls && (
-              <div className={styles.urls}>
-                已抓取链接：
-                <ul>
-                  {progress.fetchedUrls.map((url,i) => 
-                    <li key={i}>{url.slice(0,50)}...</li>
-                  )}
-                </ul>
-              </div>
-            )}
-            {progress.fetchedCount !== undefined && (
-              <progress 
-                className={styles.progressElement}
-                value={progress.fetchedCount} 
-                max={progress.totalCount}
-              />
-            )}
+            <h3>当前步骤：{progress.step}</h3>
+            <div className={styles.step}>
+              {progress.keywords && (
+                <div>已找到关键词：{progress.keywords.join(', ')}</div>
+              )}
+              {progress.fetchedUrls && (
+                <div className={styles.urls}>
+                  已抓取链接：
+                  <ul>
+                    {progress.fetchedUrls.map((url,i) => 
+                      <li key={i}>{url.slice(0,50)}...</li>
+                    )}
+                  </ul>
+                </div>
+              )}
+              {progress.fetchedCount !== undefined && (
+                <progress 
+                  className={styles.progressElement}
+                  value={progress.fetchedCount} 
+                  max={progress.totalCount}
+                />
+              )}
+            </div>
           </div>
         )}
         
