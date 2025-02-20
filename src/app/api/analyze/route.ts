@@ -90,21 +90,27 @@ export async function POST(req: Request) {
       .trim();
       const keywords = JSON.parse(keywordString);
 
+      // 推送提取的关键词
+      await writer.write(encoder.encode(JSON.stringify({ 
+        step: steps.EXTRACT_KEYWORDS,
+        keywords: keywords.keywords // 确保获取 keywords 数组
+      })));
+
       // 步骤4-6：搜索并获取内容
       await writer.write(encoder.encode(JSON.stringify({ 
         step: steps.GOOGLE_SEARCH,
-        data: { keywords }
+        data: { keywords: keywords.keywords }
       })));
       
       const contents = [];
-      for (const keyword of keywords) {
+      for (const keyword of keywords.keywords) {
         const urls = await googleSearch(keyword);
         // 推送当前关键词的搜索结果
         await writer.write(encoder.encode(JSON.stringify({
           step: steps.FETCH_CONTENTS,
           fetchedUrls: urls,  // 直接使用正确字段名
           fetchedCount: contents.length + 1,
-          totalCount: keywords.length * 2  // 假设每个关键词抓取2个链接
+          totalCount: keywords.keywords.length * 2  // 假设每个关键词抓取2个链接
         })));
 
         for (const url of urls) {
