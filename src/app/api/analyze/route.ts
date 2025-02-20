@@ -118,7 +118,18 @@ export async function POST(req: Request) {
 
         for (const result of results) {
           const content = await fetch(result.url).then(r => r.text());
-          contents.push({ keyword, content: cheerio.load(content).text() });
+          const contentText = cheerio.load(content).text().substring(0, 10000); // Limit content to 10000 characters
+          contents.push({ keyword, content: contentText });
+          
+          // 发送带有内容预览的更新
+          await writer.write(encoder.encode(JSON.stringify({
+            step: steps.FETCH_CONTENTS,
+            fetchedUrls: [{
+              url: result.url,
+              title: result.title,
+              contentPreview: contentText.substring(0, 200) + '...'  // 添加内容预览
+            }]
+          })));
         }
       }
 

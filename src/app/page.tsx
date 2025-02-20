@@ -29,7 +29,11 @@ type ProgressState = {
   keywords?: string[];
   fetchedCount?: number;
   totalCount?: number;
-  fetchedUrls?: Array<{url: string, title: string}>;
+  fetchedUrls?: Array<{
+    url: string, 
+    title: string,
+    contentPreview?: string  // 添加内容预览字段
+  }>;
 };
 
 export default function Home() {
@@ -133,6 +137,11 @@ export default function Home() {
                            className={styles.urlLink}>
                           {item.url}
                         </a>
+                        {item.contentPreview && (
+                          <div className={styles.contentPreview}>
+                            内容预览：{item.contentPreview}
+                          </div>
+                        )}
                       </li>
                     )}
                   </ul>
