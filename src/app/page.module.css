@@ -199,20 +199,43 @@ a.secondary {
   margin: 12px 0;
   font-size: 0.9em;
 }
+
 .urls ul {
   list-style: none;
   padding: 0;
 }
+
 .urls li {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--gray-alpha-100);
+  border-radius: 8px;
+  border: 1px solid var(--gray-alpha-200);
+}
+
+.urls .title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--foreground);
 }
 
 .urlLink {
   color: #666;
   font-size: 0.9em;
   text-decoration: none;
+  display: block;
+  margin: 0.5rem 0;
 }
 
 .urlLink:hover {
   text-decoration: underline;
+}
+
+.contentPreview {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--gray-alpha-200);
+  font-size: 0.9em;
+  line-height: 1.5;
+  color: #666;
 }

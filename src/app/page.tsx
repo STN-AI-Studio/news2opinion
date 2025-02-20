@@ -127,19 +127,20 @@ export default function Home() {
               )}
               {progress.fetchedUrls && (
                 <div className={styles.urls}>
-                  已抓取链接：
+                  <h4>已抓取链接：</h4>
                   <ul>
                     {progress.fetchedUrls.map((item, i) => 
                       <li key={i}>
-                        {item.title}
-                        <br />
-                        <a href={item.url} target="_blank" rel="noopener noreferrer" 
+                        <div className={styles.title}>{item.title}</div>
+                        <a href={item.url} 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
                            className={styles.urlLink}>
                           {item.url}
                         </a>
                         {item.contentPreview && (
                           <div className={styles.contentPreview}>
-                            内容预览：{item.contentPreview}
+                            <strong>内容预览：</strong>{item.contentPreview}
                           </div>
                         )}
                       </li>
