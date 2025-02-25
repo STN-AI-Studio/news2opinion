@@ -31,6 +31,13 @@ export default function Home() {
     prompt: false,
     result: false
   });
+  // 添加配置状态
+  const [config, setConfig] = useState({
+    keywordsCount: 5,
+    searchResultsPerKeyword: 2
+  });
+  // 添加配置面板显示状态
+  const [showConfig, setShowConfig] = useState(false);
 
   const analyzeUrl = async (url: string) => {
     setLoading(true);
@@ -38,7 +45,10 @@ export default function Home() {
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url })
+        body: JSON.stringify({ 
+          url,
+          config // 将配置参数传递给API
+        })
       });
 
       const reader = res.body?.getReader();
@@ -122,6 +132,15 @@ export default function Home() {
     }
   };
 
+  // 处理配置变更
+  const handleConfigChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setConfig(prev => ({
+      ...prev,
+      [name]: parseInt(value, 10)
+    }));
+  };
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
@@ -149,7 +168,43 @@ export default function Home() {
           >
             {loading ? '生成中...' : '生成'}
           </button>
+          <button 
+            className={styles.configButton}
+            onClick={() => setShowConfig(!showConfig)}
+          >
+            ⚙️
+          </button>
         </div>
+
+        {showConfig && (
+          <div className={styles.configPanel}>
+            <h3>配置选项</h3>
+            <div className={styles.configItem}>
+              <label htmlFor="keywordsCount">关键词数量:</label>
+              <input
+                type="number"
+                id="keywordsCount"
+                name="keywordsCount"
+                min="1"
+                max="10"
+                value={config.keywordsCount}
+                onChange={handleConfigChange}
+              />
+            </div>
+            <div className={styles.configItem}>
+              <label htmlFor="searchResultsPerKeyword">每个关键词搜索结果数:</label>
+              <input
+                type="number"
+                id="searchResultsPerKeyword"
+                name="searchResultsPerKeyword"
+                min="1"
+                max="5"
+                value={config.searchResultsPerKeyword}
+                onChange={handleConfigChange}
+              />
+            </div>
+          </div>
+        )}
 
         {loading && <div className={styles.loading}>生成中...</div>}
 

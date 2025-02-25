@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
 
-// 全局配置变量
-const CONFIG = {
-  KEYWORDS_COUNT: 3,  // 提取的关键词数量
-  SEARCH_RESULTS_PER_KEYWORD: 3  // 每个关键词搜索的网页数量
+// 全局配置变量默认值（当前端未提供时使用）
+const DEFAULT_CONFIG = {
+  KEYWORDS_COUNT: 5,  // 提取的关键词数量
+  SEARCH_RESULTS_PER_KEYWORD: 2  // 每个关键词搜索的网页数量
 };
 
 const steps = {
@@ -16,17 +16,24 @@ const steps = {
 };
 
 // 新增Google搜索函数
-async function googleSearch(keyword: string) {
+async function googleSearch(keyword: string, resultsPerKeyword: number) {
   const res = await fetch(`https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_KEY}&cx=${process.env.GOOGLE_CX}&q=${encodeURIComponent(keyword)}`);
   const data = await res.json();
-  return data.items?.slice(0, CONFIG.SEARCH_RESULTS_PER_KEYWORD).map((item: any) => ({
+  return data.items?.slice(0, resultsPerKeyword).map((item: any) => ({
     url: item.link,
     title: item.title
   })) || [];
 }
 
 export async function POST(req: Request) {
-  const { url } = await req.json();
+  const { url, config } = await req.json();
+  
+  // 使用前端传递的配置或默认配置
+  const CONFIG = {
+    KEYWORDS_COUNT: config?.keywordsCount || DEFAULT_CONFIG.KEYWORDS_COUNT,
+    SEARCH_RESULTS_PER_KEYWORD: config?.searchResultsPerKeyword || DEFAULT_CONFIG.SEARCH_RESULTS_PER_KEYWORD
+  };
+  
   const responseStream = new TransformStream();
   const writer = responseStream.writable.getWriter();
   const encoder = new TextEncoder();
@@ -113,7 +120,7 @@ export async function POST(req: Request) {
       
       const contents = [];
       for (const keyword of keywords.keywords) {
-        const results = await googleSearch(keyword);
+        const results = await googleSearch(keyword, CONFIG.SEARCH_RESULTS_PER_KEYWORD);
         // 推送当前关键词的搜索结果，现在包含标题
         await writer.write(encoder.encode(JSON.stringify({
           step: steps.FETCH_CONTENTS,
