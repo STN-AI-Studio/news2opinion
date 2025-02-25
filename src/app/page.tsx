@@ -171,13 +171,15 @@ export default function Home() {
         )}
 
         {progress?.prompt && (
+          <div className={styles.prompt}>
+            <h3>生成提示词</h3>
+            <pre>{progress.prompt}</pre>
+          </div>
+        )}
+
+        {progress?.result && (
           <div className={styles.result}>
-            {progress.prompt && (
-              <div className={styles.prompt}>
-                <h3>生成提示词</h3>
-                <pre>{progress.prompt}</pre>
-              </div>
-            )}
+            <h3>生成结果</h3>
             <pre>{progress.result}</pre>
           </div>
         )}
