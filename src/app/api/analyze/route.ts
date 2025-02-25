@@ -176,8 +176,6 @@ export async function POST(req: Request) {
         })
       });
 
-      await writer.write(encoder.encode(JSON.stringify(finalRes)));
-
       // 解析返回的JSON字符串
       const finalResData = await finalRes.json();
       const jsonString = finalResData.choices[0].message.content
@@ -186,7 +184,7 @@ export async function POST(req: Request) {
         .trim();
       const analysisResult = JSON.parse(jsonString);
 
-      await writer.write(encoder.encode(JSON.stringify(analysisResult)));
+      await writer.write(encoder.encode(JSON.stringify(finalResData)));
       await writer.close();
     } catch (error) {
       await writer.write(encoder.encode(JSON.stringify({ error: '处理失败' })));
