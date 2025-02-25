@@ -27,6 +27,10 @@ type ProgressState = {
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState<ProgressState | null>(null);
+  const [copyStatus, setCopyStatus] = useState<{prompt: boolean, result: boolean}>({
+    prompt: false,
+    result: false
+  });
 
   const analyzeUrl = async (url: string) => {
     setLoading(true);
@@ -103,6 +107,21 @@ export default function Home() {
     });
   };
 
+  // 复制文本到剪贴板
+  const copyToClipboard = async (text: string, type: 'prompt' | 'result') => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyStatus(prev => ({ ...prev, [type]: true }));
+      
+      // 3秒后重置复制状态
+      setTimeout(() => {
+        setCopyStatus(prev => ({ ...prev, [type]: false }));
+      }, 3000);
+    } catch (err) {
+      console.error('复制失败:', err);
+    }
+  };
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
@@ -172,14 +191,30 @@ export default function Home() {
 
         {progress?.prompt && (
           <div className={styles.prompt}>
-            <h3>生成提示词</h3>
+            <div className={styles.headerWithButton}>
+              <h3>生成提示词</h3>
+              <button 
+                className={styles.copyButton}
+                onClick={() => copyToClipboard(progress.prompt!, 'prompt')}
+              >
+                {copyStatus.prompt ? '已复制' : '复制'}
+              </button>
+            </div>
             <pre>{progress.prompt}</pre>
           </div>
         )}
 
         {progress?.result && (
           <div className={styles.result}>
-            <h3>生成结果</h3>
+            <div className={styles.headerWithButton}>
+              <h3>生成结果</h3>
+              <button 
+                className={styles.copyButton}
+                onClick={() => copyToClipboard(progress.result!, 'result')}
+              >
+                {copyStatus.result ? '已复制' : '复制'}
+              </button>
+            </div>
             <pre>{progress.result}</pre>
           </div>
         )}

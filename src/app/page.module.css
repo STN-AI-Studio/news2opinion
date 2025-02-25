@@ -159,6 +159,21 @@ a.secondary {
     align-items: center;
     justify-content: center;
   }
+  
+  .prompt pre {
+    font-size: 0.8em;
+    padding: 10px;
+    max-width: 100%;
+  }
+  
+  .result pre {
+    font-size: 0.8em;
+  }
+  
+  .copyButton {
+    font-size: 0.7em;
+    padding: 4px 8px;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -249,10 +264,27 @@ a.secondary {
   margin-top: 20px;
 }
 
+.result h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  color: #666;
+}
+
+.result pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: var(--font-geist-sans);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
 .prompt {
   margin-bottom: 20px;
   padding-bottom: 20px;
   border-bottom: 1px solid var(--gray-alpha-200);
+  width: 100%;
 }
 
 .prompt h3 {
@@ -260,6 +292,31 @@ a.secondary {
   margin-bottom: 10px;
   font-size: 1.2em;
   color: #666;
+}
+
+.headerWithButton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.copyButton {
+  background-color: var(--gray-alpha-100);
+  border: 1px solid var(--gray-alpha-200);
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 0.8em;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.copyButton:hover {
+  background-color: var(--gray-alpha-200);
+}
+
+.copyButton:active {
+  transform: scale(0.98);
 }
 
 .prompt pre {
@@ -270,16 +327,8 @@ a.secondary {
   font-size: 0.9em;
   line-height: 1.5;
   white-space: pre-wrap;
-  border: 1px solid var(--gray-alpha-200);
-}
-
-.result pre {
-  white-space: pre-wrap;
   word-wrap: break-word;
-  font-family: var(--font-geist-sans);
-  line-height: 1.6;
-  margin: 0;
-  padding: 0;
+  border: 1px solid var(--gray-alpha-200);
 }
 
 .pagePreview {
