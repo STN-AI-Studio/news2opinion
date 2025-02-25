@@ -170,7 +170,7 @@ export default function Home() {
           </div>
         )}
 
-        {progress?.result && (
+        {progress?.prompt && (
           <div className={styles.result}>
             {progress.prompt && (
               <div className={styles.prompt}>
