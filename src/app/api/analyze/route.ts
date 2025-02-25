@@ -201,7 +201,12 @@ export async function POST(req: Request) {
             - 🤔矛盾点分析
             - 🕹️预测发展
             
-            原始内容：${JSON.stringify(contents)}
+            【原始网页内容】：
+            ${JSON.stringify(pageData)}
+            
+            【关键词搜索获取的额外内容】：
+            ${JSON.stringify(contents)}
+            
             请直接返回文本格式，不要包含JSON结构`;
             
       // 先发送步骤和prompt信息
