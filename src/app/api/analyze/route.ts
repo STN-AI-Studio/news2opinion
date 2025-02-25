@@ -135,7 +135,6 @@ export async function POST(req: Request) {
 
       // 步骤7：最终分析
       await writer.write(encoder.encode(JSON.stringify({ step: steps.FINAL_ANALYSIS })));
-      await writer.write(encoder.encode(JSON.stringify(contents)));
       const finalRes = await fetch('https://ark.cn-beijing.volces.com/api/v3/chat/completions', {
         method: 'POST',
         headers: {
@@ -169,7 +168,7 @@ export async function POST(req: Request) {
         })
       });
 
-      writer.write(encoder.encode(JSON.stringify(finalRes)));
+      await writer.write(encoder.encode(JSON.stringify(finalRes)));
 
       // 解析返回的JSON字符串
       const finalResData = await finalRes.json();
