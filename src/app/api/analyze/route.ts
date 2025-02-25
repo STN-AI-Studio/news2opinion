@@ -142,7 +142,7 @@ export async function POST(req: Request) {
           'Authorization': `Bearer ${process.env.ARK_API_KEY}`
         },
         body: JSON.stringify({
-          model: "ep-20250212142132-dt2hj", // DeepSeek R1
+          model: "ep-20250213151422-75z99", // DeepSeek R1
           messages: [{
             role: "user",
             content: `根据以下网页内容生成游戏/ACG领域热点事件分析报告，要求：
