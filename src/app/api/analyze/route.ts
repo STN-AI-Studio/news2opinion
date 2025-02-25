@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
 
+// 全局配置变量
+const CONFIG = {
+  KEYWORDS_COUNT: 3,  // 提取的关键词数量
+  SEARCH_RESULTS_PER_KEYWORD: 3  // 每个关键词搜索的网页数量
+};
+
 const steps = {
   FETCH_PAGE: '正在获取网页内容',
   EXTRACT_KEYWORDS: '正在提取流量关键词',
@@ -13,7 +19,7 @@ const steps = {
 async function googleSearch(keyword: string) {
   const res = await fetch(`https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_KEY}&cx=${process.env.GOOGLE_CX}&q=${encodeURIComponent(keyword)}`);
   const data = await res.json();
-  return data.items?.slice(0, 2).map((item: any) => ({
+  return data.items?.slice(0, CONFIG.SEARCH_RESULTS_PER_KEYWORD).map((item: any) => ({
     url: item.link,
     title: item.title
   })) || [];
@@ -74,7 +80,7 @@ export async function POST(req: Request) {
             1. 聚焦内容核心矛盾或亮点
             2. 选择具有话题性和争议性的词汇
             3. 优先包含网络热词或时事关联词
-            4. 最多输出2个关键词
+            4. 最多输出${CONFIG.KEYWORDS_COUNT}个关键词
             5. 输出格式：
             {
               keywords: string[]
@@ -113,7 +119,7 @@ export async function POST(req: Request) {
           step: steps.FETCH_CONTENTS,
           fetchedUrls: results,  // 现在包含 url 和 title
           fetchedCount: contents.length + 1,
-          totalCount: keywords.keywords.length * 2
+          totalCount: keywords.keywords.length * CONFIG.SEARCH_RESULTS_PER_KEYWORD
         })));
 
         for (const result of results) {
