@@ -296,7 +296,7 @@ a.secondary {
 
 .headerWithButton {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   margin-bottom: 10px;
 }
@@ -309,6 +309,7 @@ a.secondary {
   font-size: 0.8em;
   cursor: pointer;
   transition: background-color 0.2s, transform 0.1s;
+  margin-left: 10px;
 }
 
 .copyButton:hover {
