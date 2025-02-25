@@ -178,11 +178,11 @@ export async function POST(req: Request) {
         .trim();
       const analysisResult = JSON.parse(jsonString);
 
-      writer.write(encoder.encode(JSON.stringify(analysisResult)));
-      writer.close();
+      await writer.write(encoder.encode(JSON.stringify(analysisResult)));
+      await writer.close();
     } catch (error) {
-      writer.write(encoder.encode(JSON.stringify({ error: '处理失败' })));
-      writer.close();
+      await writer.write(encoder.encode(JSON.stringify({ error: '处理失败' })));
+      await writer.close();
     }
   })();
 
