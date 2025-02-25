@@ -3,20 +3,6 @@ import Image from "next/image";
 import styles from "./page.module.css";
 import { useState } from "react";
 
-// 添加结果类型定义
-interface AnalysisResult {
-  title: string;
-  impression: string;
-  entities: string[];
-  opinions: {
-    type: '正面' | '反面' | '中立';
-    content: string;
-    subpoints: string[];
-  }[];
-  summary?: string;
-  timeline?: string[];
-}
-
 // 更新进度状态类型
 type ProgressState = {
   step: string;
@@ -34,10 +20,10 @@ type ProgressState = {
     title: string,
     contentPreview?: string  // 添加内容预览字段
   }>;
+  result?: string; // 添加文本结果字段
 };
 
 export default function Home() {
-  const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState<ProgressState | null>(null);
 
@@ -78,7 +64,6 @@ export default function Home() {
       }
     } finally {
       setLoading(false);
-      setProgress(null);
     }
   };
 
@@ -88,37 +73,33 @@ export default function Home() {
       return;
     }
 
-    if (message.step) {
-      setProgress(prev => {
-        // 如果有新的 fetchedUrls，需要更新或添加
-        let updatedFetchedUrls = prev?.fetchedUrls || [];
-        if (message.fetchedUrls) {
-          message.fetchedUrls.forEach((newUrl: any) => {
-            const existingIndex = updatedFetchedUrls.findIndex(
-              existing => existing.url === newUrl.url
-            );
-            if (existingIndex >= 0) {
-              // 更新已存在的URL信息
-              updatedFetchedUrls[existingIndex] = {
-                ...updatedFetchedUrls[existingIndex],
-                ...newUrl
-              };
-            } else {
-              // 添加新的URL
-              updatedFetchedUrls = [...updatedFetchedUrls, newUrl];
-            }
-          });
-        }
+    setProgress(prev => {
+      // 如果有新的 fetchedUrls，需要更新或添加
+      let updatedFetchedUrls = prev?.fetchedUrls || [];
+      if (message.fetchedUrls) {
+        message.fetchedUrls.forEach((newUrl: any) => {
+          const existingIndex = updatedFetchedUrls.findIndex(
+            existing => existing.url === newUrl.url
+          );
+          if (existingIndex >= 0) {
+            // 更新已存在的URL信息
+            updatedFetchedUrls[existingIndex] = {
+              ...updatedFetchedUrls[existingIndex],
+              ...newUrl
+            };
+          } else {
+            // 添加新的URL
+            updatedFetchedUrls = [...updatedFetchedUrls, newUrl];
+          }
+        });
+      }
 
-        return {
-          ...prev,
-          ...message,
-          fetchedUrls: updatedFetchedUrls
-        };
-      });
-    } else {
-      setResult(message);
-    }
+      return {
+        ...prev,
+        ...message,
+        fetchedUrls: updatedFetchedUrls
+      };
+    });
   };
 
   return (
@@ -188,38 +169,9 @@ export default function Home() {
           </div>
         )}
 
-        {result && (
+        {progress?.result && (
           <div className={styles.result}>
-            <h2>{result.title}</h2>
-            {result.summary && <div className={styles.summary}>{result.summary}</div>}
-            <div className={styles.tag}>{result.impression}</div>
-            <div className={styles.section}>
-              <h3>主体分析</h3>
-              <ul>
-                {(result.entities || []).map((e, i) => <li key={i}>{e}</li>)}
-              </ul>
-            </div>
-            <div className={styles.section}>
-              <h3>时间线</h3>
-              <ul className={styles.timeline}>
-                {(result.timeline || []).map((t, i) => (
-                  <li key={i}>{t}</li>
-                ))}
-              </ul>
-            </div>
-            <div className={styles.section}>
-              <h3>观点矩阵</h3>
-              {(result.opinions || []).map((o, i) => (
-                <div key={i} className={styles.opinion}>
-                  <div className={styles[o.type]}>{o.type}</div>
-                  <p>{o.content}</p>
-                  <ul>
-                    {(o.subpoints || []).map((s, j) => <li key={j}>{s}</li>)}
-                  </ul>
-                </div>
-              ))}
-              {!result.opinions?.length && <p>暂无观点分析</p>}
-            </div>
+            <pre>{progress.result}</pre>
           </div>
         )}
       </main>

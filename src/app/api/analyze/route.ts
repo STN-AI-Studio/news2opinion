@@ -156,35 +156,63 @@ export async function POST(req: Request) {
                - 包袱（埋梗点）
                - 副标题（补充说明）
                - 实拍（具体案例）
-            5. 输出结构：
-            {
-              title: "《"+网络热词+"》"+事件核心矛盾,
-              summary: "用梗文化语言概括事件本质",
-              impression: "第一反应梗评",
-              entities: ["主体1:特征描述", "主体2:行为模式", ...], // 至少5个
-              timeline: ["🍉起因梗化描述", "⚡️转折名场面", "💥结果预测"], 
-              opinions: [{
-                type: "正面/反面/中立",
-                stance: "立场概括（使用流行句式）",
-                content: "观点+热梗类比",
-                subpoints: ["🎮类比游戏场景", "🤔矛盾点分析", "🕹️预测发展"] 
-              }]
-            }
+            5. 输出格式：
+            新闻标题：
+            《网络热词》事件核心矛盾
+            
+            一句话概括新闻内容：
+            用梗文化语言概括事件本质
+            
+            第一印象：
+            第一反应梗评
+            
+            新闻来源：
+            ${url}
+            
+            摘要：
+            主体：
+            主体1：特征描述
+            主体2：行为模式
+            ...（至少5个）
+            
+            事件全程：
+            🍉起因梗化描述
+            ⚡️转折名场面
+            💥结果预测
+            
+            观点：
+            1. 正面观点：立场概括（使用流行句式）
+            观点+热梗类比
+            - 🎮类比游戏场景
+            - 🤔矛盾点分析
+            - 🕹️预测发展
+            
+            2. 反面观点：立场概括（使用流行句式）
+            观点+热梗类比
+            - 🎮类比游戏场景
+            - 🤔矛盾点分析
+            - 🕹️预测发展
+            
+            3. 中立观点：立场概括（使用流行句式）
+            观点+热梗类比
+            - 🎮类比游戏场景
+            - 🤔矛盾点分析
+            - 🕹️预测发展
+            
             原始内容：${JSON.stringify(contents)}
-            请返回合法JSON，不要包含注释和其他内容`
+            请直接返回文本格式，不要包含JSON结构`
           }]
         })
       });
 
-      // 解析返回的JSON字符串
       const finalResData = await finalRes.json();
-      const jsonString = finalResData.choices[0].message.content
-        .replace(/^```json\s*/, '')  // 移除开头的```json
-        .replace(/```\s*$/, '')           // 移除结尾的```
-        .trim();
-      const analysisResult = JSON.parse(jsonString);
+      const textResult = finalResData.choices[0].message.content.trim();
 
-      await writer.write(encoder.encode(JSON.stringify(finalResData)));
+      // 直接发送文本结果
+      await writer.write(encoder.encode(JSON.stringify({ 
+        step: steps.FINAL_ANALYSIS,
+        result: textResult
+      })));
       await writer.close();
     } catch (error) {
       await writer.write(encoder.encode(JSON.stringify({ error: '处理失败' })));
