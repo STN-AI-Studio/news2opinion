@@ -134,18 +134,7 @@ export async function POST(req: Request) {
       }
 
       // 步骤7：最终分析
-      await writer.write(encoder.encode(JSON.stringify({ step: steps.FINAL_ANALYSIS })));
-      const finalRes = await fetch('https://ark.cn-beijing.volces.com/api/v3/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.ARK_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "ep-20250213151422-75z99", // DeepSeek R1
-          messages: [{
-            role: "user",
-            content: `根据以下网页内容生成游戏/ACG领域热点事件分析报告，要求：
+      const finalPrompt = `根据以下网页内容生成游戏/ACG领域热点事件分析报告，要求：
             1. 【情绪化标题】标题需包含网络流行梗或热词，采用《XXX》+感叹号+争议点表述形式
             2. 【多维度分析】识别至少5个利益相关方，用「主体：特征描述」格式说明各方立场
             3. 【辩证观点】包含正反中立三方观点各3个，每个观点需：
@@ -200,7 +189,25 @@ export async function POST(req: Request) {
             - 🕹️预测发展
             
             原始内容：${JSON.stringify(contents)}
-            请直接返回文本格式，不要包含JSON结构`
+            请直接返回文本格式，不要包含JSON结构`;
+            
+      // 先发送步骤和prompt信息
+      await writer.write(encoder.encode(JSON.stringify({ 
+        step: steps.FINAL_ANALYSIS,
+        prompt: finalPrompt
+      })));
+      
+      const finalRes = await fetch('https://ark.cn-beijing.volces.com/api/v3/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.ARK_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "ep-20250213151422-75z99", // DeepSeek R1
+          messages: [{
+            role: "user",
+            content: finalPrompt
           }]
         })
       });
@@ -208,7 +215,7 @@ export async function POST(req: Request) {
       const finalResData = await finalRes.json();
       const textResult = finalResData.choices[0].message.content.trim();
 
-      // 直接发送文本结果
+      // 发送最终结果
       await writer.write(encoder.encode(JSON.stringify({ 
         step: steps.FINAL_ANALYSIS,
         result: textResult

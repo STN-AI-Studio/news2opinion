@@ -21,6 +21,7 @@ type ProgressState = {
     contentPreview?: string  // 添加内容预览字段
   }>;
   result?: string; // 添加文本结果字段
+  prompt?: string; // 添加prompt字段
 };
 
 export default function Home() {
@@ -171,6 +172,12 @@ export default function Home() {
 
         {progress?.result && (
           <div className={styles.result}>
+            {progress.prompt && (
+              <div className={styles.prompt}>
+                <h3>生成提示词</h3>
+                <pre>{progress.prompt}</pre>
+              </div>
+            )}
             <pre>{progress.result}</pre>
           </div>
         )}

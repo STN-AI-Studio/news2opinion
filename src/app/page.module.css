@@ -249,6 +249,30 @@ a.secondary {
   margin-top: 20px;
 }
 
+.prompt {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--gray-alpha-200);
+}
+
+.prompt h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  color: #666;
+}
+
+.prompt pre {
+  background-color: rgba(var(--gray-rgb), 0.03);
+  padding: 15px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.9em;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  border: 1px solid var(--gray-alpha-200);
+}
+
 .result pre {
   white-space: pre-wrap;
   word-wrap: break-word;
