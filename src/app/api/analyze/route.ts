@@ -163,7 +163,8 @@ export async function POST(req: Request) {
                  subpoints: string[]
                }[]
              }
-            原始内容：${JSON.stringify(contents)}`
+            原始内容：${JSON.stringify(contents)}
+            请直接返回合法JSON，不要包含其他内容`
           }]
         })
       });
