@@ -17,7 +17,7 @@
 - React 19
 - TypeScript
 - Cheerio
-- 百度千帆大模型API
+- 火山云大模型API
 - Google Custom Search API
 
 ## 环境要求
@@ -26,7 +26,7 @@
 - 需要配置以下环境变量:
 
 ```1:3:example.env
-QIANFAN_KEY=your_qianfan_key
+ARK_API_KEY=your_ark_api_key
 GOOGLE_KEY=your_google_key
 GOOGLE_CX=your_google_cx
 ```

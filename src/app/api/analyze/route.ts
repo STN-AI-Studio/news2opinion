@@ -60,14 +60,14 @@ export async function POST(req: Request) {
      
       // 步骤3：提取关键词
       await writer.write(encoder.encode(JSON.stringify({ step: steps.EXTRACT_KEYWORDS })));
-      const keywordsRes = await fetch('https://qianfan.baidubce.com/v2/chat/completions', {
+      const keywordsRes = await fetch('https://ark.cn-beijing.volces.com/api/v3/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.QIANFAN_KEY}`
+          'Authorization': `Bearer ${process.env.ARK_API_KEY}`
         },
         body: JSON.stringify({
-          model: "deepseek-v3",
+          model: "ep-20250213151422-75z99",
           messages: [{
             role: "user",
             content: `请从以下网页内容中提取最具传播潜力的流量关键词，要求：
@@ -135,14 +135,14 @@ export async function POST(req: Request) {
 
       // 步骤7：最终分析
       await writer.write(encoder.encode(JSON.stringify({ step: steps.FINAL_ANALYSIS })));
-      const finalRes = await fetch('https://qianfan.baidubce.com/v2/chat/completions', {
+      const finalRes = await fetch('https://ark.cn-beijing.volces.com/api/v3/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.QIANFAN_KEY}`
+          'Authorization': `Bearer ${process.env.ARK_API_KEY}`
         },
         body: JSON.stringify({
-          model: "deepseek-r1",
+          model: "ep-20250213151422-75z99",
           messages: [{
             role: "user",
             content: `根据以下网页内容生成会议讨论材料，要求：
@@ -176,7 +176,7 @@ export async function POST(req: Request) {
         .trim();
       const analysisResult = JSON.parse(jsonString);
 
-      writer.write(encoder.encode(JSON.stringify(analysisResult.json())));
+      writer.write(encoder.encode(JSON.stringify(analysisResult)));
       writer.close();
     } catch (error) {
       writer.write(encoder.encode(JSON.stringify({ error: '处理失败' })));
