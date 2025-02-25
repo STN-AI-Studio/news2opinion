@@ -126,15 +126,30 @@ export default function Home() {
     <div className={styles.page}>
       <main className={styles.main}>
         <h1>自媒体观点生成器 V0.1</h1>
-        <input
-          type="url"
-          placeholder="输入新闻URL"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              analyzeUrl((e.target as HTMLInputElement).value)
-            }
-          }}
-        />
+        <div className={styles.inputContainer}>
+          <input
+            type="url"
+            placeholder="输入新闻URL"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                analyzeUrl((e.target as HTMLInputElement).value)
+              }
+            }}
+            className={styles.urlInput}
+          />
+          <button 
+            className={styles.generateButton}
+            onClick={(e) => {
+              const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+              if (input && input.value) {
+                analyzeUrl(input.value);
+              }
+            }}
+            disabled={loading}
+          >
+            {loading ? '生成中...' : '生成'}
+          </button>
+        </div>
 
         {loading && <div className={styles.loading}>生成中...</div>}
 
